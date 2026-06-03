@@ -1,0 +1,94 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  ADMIN
+  SELLER
+  BUYER
+}
+
+enum Dimension {
+  WEIGHT
+  VOLUME
+  COUNT
+}
+
+enum Unit {
+  g
+  kg
+  mL
+  L
+  item
+}
+
+enum OrderStatus {
+  QUOTATION
+  CONFIRMED
+  SHIPPED
+  CANCELLED
+}
+
+model User {
+  id       String  @id @default(uuid())
+  email    String  @unique
+  password String // Hashed
+  role     Role
+  orders   Order[]
+  products Product[]
+}
+
+model Product {
+  id                String    @id @default(uuid())
+  name              String
+  description       String?
+  dimension         Dimension
+  
+  // Inventory is always stored in base unit (g, mL, item)
+  inventoryQuantity Decimal   @db.Decimal(24, 8) 
+  
+  // Pricing configuration
+  price             Decimal   @db.Decimal(19, 4) // INR
+  pricingUnit       Unit      // e.g., 'kg', 'L', 'item'
+  
+  sellerId          String
+  seller            User      @relation(fields: [sellerId], references: [id])
+  
+  orderItems        OrderItem[]
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+}
+
+model Order {
+  id          String      @id @default(uuid())
+  userId      String
+  user        User        @relation(fields: [userId], references: [id])
+  status      OrderStatus @default(QUOTATION)
+  totalAmount Decimal     @db.Decimal(19, 4) // INR
+  items       OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model OrderItem {
+  id                  String  @id @default(uuid())
+  orderId             String
+  order               Order   @relation(fields: [orderId], references: [id])
+  productId           String
+  product             Product @relation(fields: [productId], references: [id])
+  
+  // What the user selected in UI
+  displayQuantity     Decimal @db.Decimal(24, 8)
+  displayUnit         Unit    
+  
+  // Normalized to base unit for easy inventory tracking
+  orderedBaseQuantity Decimal @db.Decimal(24, 8) 
+  
+  // Snapshot of pricing calculation
+  priceAtTimeOfOrder  Decimal @db.Decimal(19, 4) // INR
+}
