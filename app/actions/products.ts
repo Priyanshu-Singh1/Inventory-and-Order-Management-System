@@ -38,5 +38,5 @@ export async function createProduct(formData: FormData) {
   })
 
   revalidatePath('/seller/products')
-  redirect('/seller/products')
+  return { success: true }
 }

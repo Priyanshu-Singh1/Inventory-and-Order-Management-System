@@ -7,18 +7,24 @@ import { createProduct } from '@/app/actions/products'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { useRouter } from 'next/navigation'
 
 export default function NewProductPage() {
   const [dimension, setDimension] = useState<Dimension>('WEIGHT')
   const availableUnits = getAvailableUnits(dimension)
   const baseUnit = getBaseUnit(dimension)
+  const router = useRouter()
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     const formData = new FormData(e.currentTarget)
     try {
-      await createProduct(formData)
-      toast.success('Product created successfully!')
+      const res = await createProduct(formData)
+      if (res.success) {
+        toast.success('Product created successfully!')
+        router.push('/seller/products')
+        router.refresh()
+      }
     } catch (error: any) {
       toast.error(error.message || 'Failed to create product')
     }
