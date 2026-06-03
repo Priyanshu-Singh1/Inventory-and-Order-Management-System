@@ -30,6 +30,14 @@ export default async function BuyerCatalogPage({
     }
   })
 
+  const serializedProducts = products.map(product => ({
+    ...product,
+    price: product.price.toString(),
+    inventoryQuantity: product.inventoryQuantity.toString(),
+    createdAt: product.createdAt.toISOString(),
+    updatedAt: product.updatedAt.toISOString(),
+  }))
+
   return (
     <div className="p-8">
       <div className="mb-8">
@@ -70,7 +78,7 @@ export default async function BuyerCatalogPage({
         </form>
       </div>
 
-      {products.length === 0 ? (
+      {serializedProducts.length === 0 ? (
         <div className="bg-white dark:bg-gray-800 rounded-xl p-12 text-center text-gray-500 shadow-sm border border-gray-100 dark:border-gray-700">
           <Package className="w-16 h-16 mx-auto text-gray-300 mb-4" />
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">No products found</h3>
@@ -78,7 +86,7 @@ export default async function BuyerCatalogPage({
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {products.map(product => (
+          {serializedProducts.map(product => (
             <ProductCard key={product.id} product={product} />
           ))}
         </div>

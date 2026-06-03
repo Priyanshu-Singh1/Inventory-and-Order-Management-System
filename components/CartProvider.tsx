@@ -1,10 +1,23 @@
 "use client"
 
 import React, { createContext, useContext, useState, useEffect } from 'react'
-import { Product, Unit } from '@prisma/client'
+import { Unit } from '@prisma/client'
+
+export type SerializedProduct = {
+  id: string
+  name: string
+  description: string | null
+  dimension: 'WEIGHT' | 'VOLUME' | 'COUNT'
+  inventoryQuantity: string
+  price: string
+  pricingUnit: Unit
+  sellerId: string
+  createdAt: string
+  updatedAt: string
+}
 
 export type CartItem = {
-  product: Product
+  product: SerializedProduct
   quantity: number
   unit: Unit
 }

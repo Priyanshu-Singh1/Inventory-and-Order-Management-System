@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import { Product, Unit } from '@prisma/client'
 import { getAvailableUnits, calculatePrice, formatCurrency } from '@/lib/units'
-import { useCart } from '@/components/CartProvider'
+import { useCart, SerializedProduct } from '@/components/CartProvider'
 import toast from 'react-hot-toast'
 import { Plus, Weight, Droplets, Hash, Landmark } from 'lucide-react'
 
-export default function ProductCard({ product }: { product: Product }) {
+export default function ProductCard({ product }: { product: SerializedProduct }) {
   const availableUnits = getAvailableUnits(product.dimension)
   const [quantity, setQuantity] = useState<number>(1)
   const [selectedUnit, setSelectedUnit] = useState<Unit>(availableUnits[0])
